@@ -350,9 +350,8 @@ class MapApp {
           <div class="workout__details">
             <span class="workout__icon">⏱</span>
             <span class="workout__value">${obj.duration}</span>
-            <span class="workout__unit">${
-              obj.type === 'driving' ? 'hours' : 'mins'
-            }</span>
+            <span class="workout__unit"> mins
+            </span>
           </div> `;
 
     // if (obj.type === 'running') {
