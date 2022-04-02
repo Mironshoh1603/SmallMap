@@ -99,10 +99,12 @@ class MapApp {
   step = 0;
   #database = [];
   constructor() {
+    this._getLocalStorage();
     this._getCurrentMapPosition();
     inputType.addEventListener('change', this._selectMapToggle);
     document.addEventListener('keydown', this._enterPress.bind(this));
     form.addEventListener('submit', this._createObject.bind(this));
+    containerWorkouts.addEventListener('click', this._moveCenter.bind(this));
   }
 
   _getCurrentMapPosition() {
@@ -163,6 +165,7 @@ class MapApp {
         console.log(redlat, redlong);
 
         document.querySelector('.popup-red').classList.add('hidden_popup');
+        document.querySelector('.popup-green').classList.remove('hidden_popup');
         this._setMapDragbleTrueMarker(
           (latitude -= 0.001),
           (longitude -= 0.005),
@@ -170,6 +173,7 @@ class MapApp {
         );
       } else if (this.step == 2) {
         this.step++;
+        document.querySelector('.popup-green').classList.add('hidden_popup');
         map.removeLayer(marker);
 
         this._setMapDragbleFalseMarker(latitude, longitude, greenIcon);
@@ -202,10 +206,51 @@ class MapApp {
         document
           .querySelector('.popup-navigation')
           .classList.remove('hidden_popup');
+      } else if (this.step == 2) {
+        this.step--;
+        document.querySelector('.popup-red').classList.remove('hidden_popup');
       }
     }
   }
+  _moveCenter(e) {
+    let element = e.target.closest('.workout');
+    if (!element) {
+      return;
+    }
+    let elementId = element.getAttribute('data-id');
+    let objs = this.#database.find(val => {
+      return val.id === elementId;
+    });
+    console.log(objs);
+    map.setView(objs.fromCoords, 17, {
+      animate: true,
+      pan: {
+        duration: 2,
+      },
+    });
+    map.setView(objs.toCoords, 17, {
+      animate: true,
+      pan: {
+        duration: 2,
+      },
+    });
+    way = L.Routing.control({
+      waypoints: [objs.fromCoords, objs.toCoords],
 
+      lineOptions: {
+        styles: [
+          {
+            color: 'darkblue',
+            opacity: 1,
+            wight: 5,
+          },
+        ],
+      },
+    }).addTo(map);
+    document.querySelector('.leaflet-right:first-child').style.visibility =
+      'visible';
+    L.circle(objs.fromCoords, { radius: 10 }).addTo(map);
+  }
   _createObject(e) {
     e.preventDefault();
     let sporter;
@@ -244,7 +289,6 @@ class MapApp {
       );
     } else if (inputType.value === 'driving') {
       let speed = inputSpeed.value;
-      console.log(elevation);
       if (!numbermi(masofa, speed) && !musbatmi(masofa, speed)) {
         return 'Error!';
       }
@@ -261,8 +305,7 @@ class MapApp {
     console.log(this.#database);
 
     this.step = 0;
-    document.querySelector('.leaflet-routing-container').style.visibility =
-      'hidden';
+    document.querySelector('.leaflet-right').style.visibility = 'hidden';
     this._hideForm();
     this._setLocalStorage();
   }
@@ -295,15 +338,21 @@ class MapApp {
           <h2 class="workout__title">${obj.malumot}</h2>
           <div class="workout__details">
             <span class="workout__icon">${
-              obj.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'
+              obj.type === 'running'
+                ? '🏃‍♂️'
+                : obj.type === 'cycling'
+                ? '🚴‍♀️'
+                : '🚙'
             }</span>
             <span class="workout__value">${obj.distance}</span>
-            <span class="workout__unit">km</span>
+            <span class="workout__unit">metres</span>
           </div>
           <div class="workout__details">
             <span class="workout__icon">⏱</span>
             <span class="workout__value">${obj.duration}</span>
-            <span class="workout__unit">min</span>
+            <span class="workout__unit">${
+              obj.type === 'driving' ? 'hours' : 'mins'
+            }</span>
           </div> `;
 
     // if (obj.type === 'running') {
@@ -347,9 +396,8 @@ class MapApp {
     if (!data) return;
 
     this.#database = data;
-    console.log(data);
+    console.log(this.#database);
     this.#database.forEach(val => {
-      this._setMarker(val);
       this._renderList(val);
     });
   }
@@ -377,5 +425,4 @@ class MapApp {
       .openPopup();
   }
 }
-
 const WorkMap = new MapApp();

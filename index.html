@@ -27,6 +27,7 @@
   </head>
   <body>
     <div class="sidebar">
+      <div id="google_translate_element"></div>
       <img src="logo.png" alt="Logo" class="logo" />
 
       <ul class="workouts">
@@ -132,12 +133,34 @@
         boshlang'ich manzilni belgilang!!!
       </h1>
     </div>
-    <div class="popup-red hidden_popup">Boshlang'ichni nuqtani tanlang</div>
+    <div class="popup-red hidden_popup">
+      Boshlang'ichni nuqtani tanlang! (agar marker hozir sizturgan o'rinni
+      ko'rsatyapti, xoxlasabgiz o'rnating. Lakatsiyzni tasqidlash uchun
+      <button class="enter">enter</button> tugmasini bosing!)
+    </div>
+    <div class="popup-green hidden_popup">
+      Borish nuqtani tanlang! ( Lakatsiyzni tasqidlash uchun
+      <button class="enter">enter</button> tugmasini bosing!.Orqaga qaytish
+      uchun esa <button class="escape">ESC</button> ni bosing )
+    </div>
     <!-- <div class="popup-navigation">
       <h1 class="popup-navigation__text">
         Siz <button class="enter" disabled>Enter</button> tugmasini boshing va
         boshlang'ich manzilni belgilang!!!
       </h1>
     </div> -->
+
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          { pageLanguage: 'en' },
+          'google_translate_element'
+        );
+      }
+    </script>
   </body>
+  <script
+    type="text/javascript"
+    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+  ></script>
 </html>
